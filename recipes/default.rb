@@ -18,7 +18,10 @@
 #
 
 # install filebeat
-if node['platform'] == 'windows'
+
+if node['filebeat']['alpha_package']
+  include_recipe 'filebeat::install_alpha_package'
+elsif node['platform'] == 'windows'
   include_recipe 'filebeat::install_windows'
 else
   include_recipe 'filebeat::install_package'

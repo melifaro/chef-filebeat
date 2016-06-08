@@ -3,6 +3,11 @@ filebeat CHANGELOG
 
 This file is used to list changes made in each version of the filebeat cookbook.
 
+0.3.5
+-----
+- Melifaro - Added option to install alpha version of package and pass json parse options to resource
+             Rewrited filebeat_prospector resource to 12.5 style
+
 0.3.4
 -----
 
