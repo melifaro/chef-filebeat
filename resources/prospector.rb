@@ -42,7 +42,7 @@ def prospector_config
   content['input_type'] = input_type if input_type
   content['close_older'] = close_older if close_older
   content['scan_frequency'] = scan_frequency if scan_frequency
-  content['harvester_buffer_size'] = scan_frequency if scan_frequency
+  content['harvester_buffer_size'] = harvester_buffer_size if harvester_buffer_size
   content['tail_files'] = tail_files if tail_files
   content['backoff'] = backoff if backoff
   content['max_backoff'] = max_backoff if max_backoff
@@ -62,6 +62,15 @@ def prospector_config
   content
 end
 
+def resource_file_path(resource)
+  case resource
+  when Chef::Resource::File
+    return resource.path
+  when Chef::Resource::FilebeatProspector
+    return ::File.join(node['filebeat']['prospectors_dir'], "prospector-#{resource.name}.yml")
+  end
+end
+
 def orphaned_files
   present_files = Dir.entries(node['filebeat']['prospectors_dir'])
                      .select { |f| !::File.directory? f }
@@ -69,8 +78,8 @@ def orphaned_files
                      .to_set
 
   resource_defined_files = run_context.resource_collection.all_resources
-                                      .select { |r| r.class.name == 'Chef::Resource::File' }
-                                      .map(&:path)
+                                      .select { |r| r.is_a?(Chef::Resource::File) || r.is_a?(Chef::Resource::FilebeatProspector) }
+                                      .map { |r| resource_file_path(r) }
                                       .to_set
 
   present_files - resource_defined_files
@@ -90,5 +99,11 @@ action :create do
       action :delete
     end
     Chef::Log.warn("Config file #{file} not present in defined resources, deleted.")
+  end
+end
+
+action_class do
+  def whyrun_supported?
+    true
   end
 end

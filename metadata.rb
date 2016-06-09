@@ -12,7 +12,6 @@ depends 'windows'
 depends 'powershell'
 depends 'apt'
 depends 'yum'
-#depends 'poise-service'
 
 %w(windows ubuntu centos amazon redhat fedora).each do |os|
   supports os
