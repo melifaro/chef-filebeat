@@ -92,11 +92,13 @@ action :create do
     mode 0644
     owner 'root'
     group 'root'
+    notifies :restart, 'service[filebeat]' if node['filebeat']['notify_restart'] && !node['filebeat']['disable_service']
   end
 
   orphaned_files.each do |file|
     file file do
       action :delete
+      notifies :restart, 'service[filebeat]' if node['filebeat']['notify_restart'] && !node['filebeat']['disable_service']
     end
     Chef::Log.warn("Config file #{file} not present in defined resources, deleted.")
   end
